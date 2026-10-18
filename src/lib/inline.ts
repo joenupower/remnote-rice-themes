@@ -307,6 +307,23 @@ export function fadeToTheme(gradient: string): string {
 
 const attr = (name: string, text: string) => `[${name}*="${text.replace(/"/g, '\\"')}"]`;
 
+/**
+ * Stellen, deren Farbe Inhalt ist und nicht Oberfläche: Farbtupfer und Farbwähler
+ * (Markieren, Stift, Text, Formen) und was auf einer Zeichenfläche oder PDF-Seite liegt.
+ * Ihre Farben bleiben, wie RemNote sie setzt.
+ */
+export const KEEP: string[] = [
+  '[data-test*="Color"]',
+  '[data-test*="Color"] *',
+  // Farbkreise ohne eigenes data-test (z. B. Farbplätze der Werkzeugleiste)
+  '[style*="transform: scale("][style*="box-shadow"]',
+  '.drawing-canvas-page',
+  '.drawing-canvas-items *',
+  '.drawing-canvas-pdf-pages *',
+  '.drawing-canvas-text-highlights *',
+];
+const notKeep = `:not(${KEEP.join(', ')})`;
+
 function groupByToken(map: Map<string, string>): Map<string, string[]> {
   const groups = new Map<string, string[]>();
   for (const [color, token] of map) {
@@ -326,19 +343,19 @@ export function buildInlineCss(): string {
   // Flächen
   for (const [token, colors] of groupByToken(surfaceColors())) {
     const sel = colors.flatMap((c) => [attr('style', `background-color: ${c}`), attr('style', `background: ${c}`)]);
-    parts.push(`[style*="background"]:is(${sel.join(', ')}) { background-color: rgb(var(--rn-colors-${token}-val)) !important; }`);
+    parts.push(`[style*="background"]:is(${sel.join(', ')})${notKeep} { background-color: rgb(var(--rn-colors-${token}-val)) !important; }`);
   }
 
   // Rahmen
   for (const [token, colors] of groupByToken(borderColors())) {
     const sel = colors.flatMap((c) => [attr('style', `border-color: ${c}`), attr('style', `solid ${c}`)]);
-    parts.push(`[style*="border"]:is(${sel.join(', ')}) { border-color: rgb(var(--rn-colors-${token}-val)) !important; }`);
+    parts.push(`[style*="border"]:is(${sel.join(', ')})${notKeep} { border-color: rgb(var(--rn-colors-${token}-val)) !important; }`);
   }
 
   // Helle Verlaufs-Flächen → ruhige, flache Fläche
   const surfaceSel = [...GRADIENTS.map((g) => attr('style', g)), ...CLASS_SURFACES.map((g) => attr('class', g))];
   parts.push(
-    `[style*="gradient"]:is(${surfaceSel.filter((s) => s.startsWith('[style')).join(', ')}), ${surfaceSel
+    `[style*="gradient"]:is(${surfaceSel.filter((s) => s.startsWith('[style')).join(', ')})${notKeep}, ${surfaceSel
       .filter((s) => s.startsWith('[class'))
       .join(', ')} { background-image: none !important; background-color: var(--rn-clr-background-secondary) !important; }`,
   );

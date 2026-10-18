@@ -194,6 +194,42 @@ function hueSources(p: Palette): Record<string, RGB> {
 /* CSS                                                               */
 /* ---------------------------------------------------------------- */
 
+/**
+ * Schriftfarbe auf Akzentflächen: Grundfläche oder hellste Schrift, je nachdem, was sich
+ * stärker vom Akzent abhebt.
+ */
+export function onAccentColor(p: Palette): string {
+  const accent = hexToRgb(p.accent);
+  return contrast(accent, hexToRgb(p.background)) >= contrast(accent, hexToRgb(p.bright_foreground))
+    ? p.background
+    : p.bright_foreground;
+}
+
+/**
+ * Prüft, wo Schrift und Akzent zu ähnlich sind. Genau dann wäre normale Schrift auf einem
+ * Akzentknopf schlecht lesbar (unter 3:1). Liefert Kontrast Schrift/Akzent und den Kontrast
+ * der Schrift, die das Theme auf Akzentflächen tatsächlich verwendet.
+ */
+export function accentReport(p: Palette): { textOnAccent: number; onColor: number; risky: boolean } {
+  const accent = hexToRgb(p.accent);
+  const textOnAccent = contrast(accent, hexToRgb(p.foreground));
+  const onColor = contrast(accent, hexToRgb(onAccentColor(p)));
+  return { textOnAccent, onColor, risky: textOnAccent < 3 };
+}
+
+// Markierfarben von RemNote (Variablen --highlight-color-…)
+const HIGHLIGHT_COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown', 'pink', 'gray'];
+
+function highlightSwatchCss(): string[] {
+  const swatch = (c: string) =>
+    `html body :is(.selected-text-menu__button--color, [data-test="PDF Highlight Color Button"] > span).bg-${c}-5`;
+  return [
+    ...HIGHLIGHT_COLORS.map((c) => `${swatch(c)} { background-color: var(--highlight-color-${c}) !important; }`),
+    // Ohne gewählte Farbe zeigt der Knopf ein gelbes Karomuster
+    `html body [data-test="PDF Highlight Color Button"] > span { --rn-colors-yellow-5: var(--highlight-color-yellow); --rn-colors-yellow-80: var(--highlight-color-yellow); }`,
+  ];
+}
+
 // Auch auf :root setzen: RemNote rechnet zusammengesetzte Variablen (z. B. --rn-colors-blue-5)
 // dort bereits aus; nur auf body gesetzt, kämen die Standardwerte durch.
 const ROOT = ':root, :root body, :root body.light, :root body.dark';
@@ -231,7 +267,7 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
   set('--rn-clr-content-secondary', hex(mix(fg, dim, 0.35)));
   set('--rn-clr-content-tertiary', hex(dim));
   set('--rn-clr-content-inverse-primary', p.background);
-  set('--rn-clr-content-on-color', p.background);
+  set('--rn-clr-content-on-color', onAccentColor(p));
   set('--rn-clr-content-on-color-inverse', p.bright_foreground);
   set('--rn-clr-content-accent', p.accent);
   set('--rn-clr-background-accent', p.accent);
@@ -285,6 +321,14 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
   // Dunkle Themes: RemNotes «dark:»-Gestaltung auch im hellen Modus verwenden
   // (z. B. Hintergrund beim Lernkarten-Üben, Schliessen-Knopf, Hinweisfelder)
   if (dark) parts.push(buildDarkVariantCss());
+  // Schrift auf Akzentflächen (Hauptknöpfe wie «Upload plugin», «Develop»): RemNote nimmt im
+  // Dunkelmodus die normale Schriftfarbe («dark:rn-clr-content-primary»). Ist der Akzent so hell
+  // wie die Schrift (z. B. Kanagawa), verschwindet sie. Darum gilt hier die Schrift für farbige Flächen.
+  parts.push(
+    `html body .rn-clr-background-accent :is(.rn-clr-content-primary, .dark\\:rn-clr-content-primary) { color: var(--rn-clr-content-on-color) !important; }`,
+  );
+  // Farbtupfer zum Markieren (Textauswahl im Dokument und im PDF) zeigen die echten Markierfarben
+  parts.push(...highlightSwatchCss());
   // Rechteck beim Aufziehen einer Auswahl
   parts.push(`#selection-rectangle { background-color: rgba(${accent.join(', ')}, 0.2) !important; }`);
 

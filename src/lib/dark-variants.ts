@@ -142,6 +142,24 @@ export function simpleDeclarations(cls: string): string | null {
 // lässt aber Hover-Zustände (:hover zählt wie eine Klasse) weiterhin gewinnen.
 const PREFIX = 'html :where(body.light) ';
 
+/**
+ * Markierungen im Text (Rems, Auswahl-Pillen): RemNote nimmt hell Pastelltöne, dunkel
+ * halbtransparente Farben (Werte aus «.dark { --highlight-color-… }»). Auf dunklem Theme
+ * wäre helle Schrift auf Pastell kaum lesbar. Markierungen auf PDF-Seiten bleiben pastell.
+ */
+export const DARK_HIGHLIGHTS: Record<string, string> = {
+  red: 'rgba(240, 122, 136, 0.5)',
+  orange: 'rgba(239, 133, 95, 0.5)',
+  yellow: 'rgba(240, 208, 82, 0.5)',
+  green: 'rgba(80, 174, 139, 0.5)',
+  teal: 'rgba(80, 174, 139, 0.5)',
+  blue: 'rgba(87, 174, 226, 0.5)',
+  purple: 'rgba(183, 135, 251, 0.5)',
+  brown: '#4a3228',
+  pink: '#4e2c3c',
+  gray: '#2f2f2f',
+};
+
 let cached: string | null = null;
 
 export function buildDarkVariantCss(): string {
@@ -152,6 +170,9 @@ export function buildDarkVariantCss(): string {
     if (decl) rules.push(`${PREFIX}.dark\\:${cls} { ${decl} }`);
   }
   for (const [sel, decl] of VERBATIM) rules.push(`${PREFIX}${sel} { ${decl} }`);
+  for (const [c, value] of Object.entries(DARK_HIGHLIGHTS)) {
+    rules.push(`${PREFIX}.highlight-color--${c} { --highlight-color-${c}: ${value}; }`);
+  }
   cached = rules.join('\n');
   return cached;
 }

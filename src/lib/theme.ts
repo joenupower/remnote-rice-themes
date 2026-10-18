@@ -67,6 +67,26 @@ function distance(a: RGB, b: RGB): number {
   return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 }
 
+function luminance(c: RGB): number {
+  const lin = (v: number) => {
+    const x = v / 255;
+    return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+}
+
+export function contrast(a: RGB, b: RGB): number {
+  const x = luminance(a);
+  const y = luminance(b);
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+/** Rückt c auf der Linie von base nach c so nahe an base, dass der Abstand höchstens max ist. */
+function limitDistance(base: RGB, c: RGB, max: number): RGB {
+  const d = distance(base, c);
+  return d > max ? mix(base, c, max / d) : c;
+}
+
 /* ---------------------------------------------------------------- */
 /* Skalen                                                            */
 /* ---------------------------------------------------------------- */
@@ -83,19 +103,45 @@ export function colorScale(color: RGB, bg: RGB, fg: RGB): Record<number, RGB> {
   return out;
 }
 
+/**
+ * Gedämpfte Schrift (Hinweise, Ordnernamen in der Seitenleiste). Einige Themes setzen sie fast
+ * gleich hell wie die Seitenleiste (White: Grau auf Grau); dann wird sie so weit Richtung
+ * Vordergrund gerückt, dass sie auf der Seitenleiste noch lesbar ist (Kontrast mindestens 2:1).
+ */
+export function dimText(p: Palette, sidebar?: RGB): RGB {
+  const fg = hexToRgb(p.foreground);
+  const dim = hexToRgb(p.dark_foreground);
+  const surface = sidebar ?? sidebarColor(p);
+  for (let t = 0; t <= 1.0001; t += 0.05) {
+    const c = mix(dim, fg, t);
+    if (contrast(c, surface) >= 2) return c;
+  }
+  return fg;
+}
+
+/** Fläche der Seitenleiste (Stufe 5 der Grauskala). */
+export function sidebarColor(p: Palette): RGB {
+  const bg = hexToRgb(p.background);
+  let lighter = hexToRgb(p.lighter_background);
+  if (distance(lighter, bg) < 6) lighter = mix(bg, hexToRgb(p.bright_foreground), 0.05);
+  return limitDistance(bg, lighter, 45);
+}
+
 /** Grauskala über die Stufen der Palette (Hintergrund → Auswahl → gedämpft → Text). */
 export function grayScale(p: Palette): Record<number, RGB> {
   const bg = hexToRgb(p.background);
   const fgBright = hexToRgb(p.bright_foreground);
-  let lighter = hexToRgb(p.lighter_background);
-  // Manche Themes (z. B. Solitude) haben keinen abgesetzten Hintergrund
-  if (distance(lighter, bg) < 6) lighter = mix(bg, fgBright, 0.05);
+  // Manche Themes (z. B. Solitude) haben keinen abgesetzten Hintergrund, andere setzen ihn sehr
+  // stark ab (White: Silbergrau auf Weiss). Seitenleiste und Karten sind in RemNote grosse Flächen,
+  // darum höchstens so weit vom Hintergrund wie bei den übrigen Themes.
+  const lighter = sidebarColor(p);
+  const selection = limitDistance(bg, hexToRgb(p.selection), 80);
   const anchors: [number, RGB][] = [
     [0, bg],
     [5, lighter],
-    [10, hexToRgb(p.selection)],
+    [10, selection],
     [20, hexToRgb(p.muted)],
-    [40, hexToRgb(p.dark_foreground)],
+    [40, dimText(p, lighter)],
     [70, hexToRgb(p.light_foreground)],
     [90, hexToRgb(p.foreground)],
     [100, fgBright],
@@ -181,8 +227,9 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
   set('--rn-clr-background-primary--hovered', 'var(--rn-colors-gray-5)');
   set('--rn-clr-background-inverse-primary', p.bright_foreground);
   set('--rn-clr-content-primary', p.foreground);
-  set('--rn-clr-content-secondary', hex(mix(fg, hexToRgb(p.dark_foreground), 0.35)));
-  set('--rn-clr-content-tertiary', p.dark_foreground);
+  const dim = dimText(p);
+  set('--rn-clr-content-secondary', hex(mix(fg, dim, 0.35)));
+  set('--rn-clr-content-tertiary', hex(dim));
   set('--rn-clr-content-inverse-primary', p.background);
   set('--rn-clr-content-on-color', p.background);
   set('--rn-clr-content-on-color-inverse', p.bright_foreground);

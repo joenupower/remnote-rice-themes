@@ -14,10 +14,22 @@ Unixporn-style color themes for RemNote, based on the palettes of the [Omarchy](
 | Everforest | dark |
 | Ethereal | dark |
 | Catppuccin | dark |
+| Catppuccin Latte | light |
+| Flexoki Light | light |
+| Gruvbox | dark |
+| Kanagawa | dark |
+| Last Horizon | dark |
+| Lumon | dark |
+| Matte Black | dark |
+| Osaka Jade | dark |
+| Ristretto | dark |
+| Rosé Pine | light |
+| Vantablack | dark |
+| White | light |
 
 Settings → Plugins → Rice Themes:
 
-- **Theme**: pick one of the ten themes, or "Off" for RemNote's default look
+- **Theme**: pick one of the 22 themes, or "Off" for RemNote's default look
 - **Monospace font** (terminal look, default: on). Uses JetBrains Mono / Cascadia Mono / Fira Code if installed, otherwise the system monospace font. Math formulas keep their own font.
 - **Square corners** instead of rounded ones (default: on)
 
@@ -42,12 +54,14 @@ No data leaves RemNote. No network requests, no third-party services.
 
 ## Adding themes
 
-Palettes live in `src/lib/palettes.json` and use the field names of Omarchy's `colors.toml` (`background`, `foreground`, `accent`, `red`, `green`, …). Omalauncher ships more of them under `app/src/main/assets/themes/`.
+Palettes live in `src/lib/palettes.json` and use the field names of Omarchy's `colors.toml` (`background`, `foreground`, `accent`, `red`, `green`, …), as found in Omalauncher under `app/src/main/assets/themes/`. All 22 themes Omalauncher ships are included.
+
+Two small adjustments keep RemNote readable with every palette: the sidebar color stays within a moderate distance of the background (White would otherwise get a silver-grey sidebar), and dimmed text keeps at least 2:1 contrast against the sidebar.
 
 ## Credits
 
 - Color values: Omalauncher by Simon Schubert and contributors (MIT), and the Omarchy theme authors.
-- Theme designs: Tokyo Night, Nord, Everforest, Catppuccin and others belong to their respective authors.
+- Theme designs: Tokyo Night, Nord, Everforest, Catppuccin, Gruvbox, Kanagawa, Rosé Pine, Flexoki and others belong to their respective authors.
 
 ## Development
 
@@ -58,4 +72,4 @@ Tested with RemNote 1.28 (October 2026).
 
 ## Deutsch
 
-**Rice Themes** bringt zehn Farbthemes im Unixporn-Stil nach RemNote: Tokyo Night, Solitude, Retro 82, Nord, Miasma, Lupine (hell), Hackerman, Everforest, Ethereal und Catppuccin. Die Farbwerte stammen aus Omalauncher. Dazu gibt es eine optionale Terminal-Schrift (Monospace) und eckige Kanten. Auswahl unter Einstellungen → Plugins → Rice Themes. Es werden keine Daten aus RemNote hinausgeschickt.
+**Rice Themes** bringt 22 Farbthemes im Unixporn-Stil nach RemNote: Tokyo Night, Solitude, Retro 82, Nord, Miasma, Lupine (hell), Hackerman, Everforest, Ethereal, Catppuccin, Catppuccin Latte (hell), Flexoki Light (hell), Gruvbox, Kanagawa, Last Horizon, Lumon, Matte Black, Osaka Jade, Ristretto, Rosé Pine (hell), Vantablack und White (hell). Die Farbwerte stammen aus Omalauncher. Dazu gibt es eine optionale Terminal-Schrift (Monospace) und eckige Kanten. Auswahl unter Einstellungen → Plugins → Rice Themes. Es werden keine Daten aus RemNote hinausgeschickt.

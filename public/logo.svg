@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="56" fill="#1a1b26"/>
+  <!-- Terminal-Fenster -->
+  <rect x="36" y="48" width="184" height="128" fill="#24283b" stroke="#7aa2f7" stroke-width="4"/>
+  <text x="54" y="104" font-family="monospace" font-size="34" font-weight="700" fill="#9ece6a">&gt;_</text>
+  <rect x="54" y="128" width="96" height="8" fill="#565f89"/>
+  <rect x="54" y="146" width="64" height="8" fill="#565f89"/>
+  <!-- Farbpalette -->
+  <rect x="36" y="192" width="30" height="20" fill="#f7768e"/>
+  <rect x="67" y="192" width="30" height="20" fill="#e0af68"/>
+  <rect x="98" y="192" width="30" height="20" fill="#9ece6a"/>
+  <rect x="129" y="192" width="30" height="20" fill="#7dcfff"/>
+  <rect x="160" y="192" width="30" height="20" fill="#7aa2f7"/>
+  <rect x="191" y="192" width="29" height="20" fill="#bb9af7"/>
+</svg>

@@ -25,7 +25,14 @@ Changes apply within a few seconds, without a reload. The theme looks the same w
 
 ## How it works
 
-RemNote builds its whole interface from CSS color scales (`--rn-colors-<color>-0…100`) and semantic variables (`--rn-clr-…`). For the selected palette the plugin recomputes every scale, from the theme's background (step 0) to its foreground (step 100), and registers the result with the official `app.registerCSS` API. A few places where RemNote sets colors inline (tab bar, sidebar, selection rectangle, onboarding hints) get their own rules.
+RemNote builds its whole interface from CSS color scales (`--rn-colors-<color>-0…100`) and semantic variables (`--rn-clr-…`). For the selected palette the plugin recomputes every scale, from the theme's background (step 0) to its foreground (step 100), and registers the result with the official `app.registerCSS` API.
+
+Some parts of RemNote don't use these variables:
+
+- Newer screens (flashcards home, plans, AI credits, invites, AI learning tools, onboarding cards) write colors straight into the HTML from two palettes built into the app. `src/lib/inline.ts` lists those colors and gradients and maps them onto the theme.
+- Many screens are styled twice, once for light mode and once with `dark:` classes. Dark themes use RemNote's dark styling even when RemNote is set to light mode (`src/lib/dark-variants.ts`), so for example the flashcard practice background stays dark.
+
+Both lists were taken from RemNote 1.28. If a later RemNote version adds new hard-coded colors, they may show up light until the lists are updated.
 
 The plugin runs sandboxed and only uses official plugin APIs.
 

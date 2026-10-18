@@ -8,6 +8,8 @@
  * (Stufe 100). Damit sieht das Theme im hellen und im dunklen Modus gleich aus.
  */
 import palettesJson from './palettes.json';
+import { buildInlineCss } from './inline';
+import { buildDarkVariantCss } from './dark-variants';
 
 export interface Palette {
   id: string;
@@ -194,6 +196,9 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
   set('--rn-clr-background-logo-color', p.accent);
   set('--rn-clr-content-logo-color', p.accent);
   set('--rn-clr-overlay-hsl', dark ? 'var(--rn-clr-white-hsl)' : 'var(--rn-clr-black-hsl)');
+  // Diese zwei Hover-Farben sind bei RemNote fest hell eingetragen
+  set('--rn-clr-background-light-warning--hovered', 'rgb(var(--rn-colors-yellow-10-val))');
+  set('--rn-clr-background-light-positive--hovered', 'rgb(var(--rn-colors-green-10-val))');
   // Erhöhte Flächen (Menüs, Karten, Popups)
   for (const e of [5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]) {
     const alpha = { 5: 0.05, 10: 0.07, 15: 0.09, 20: 0.11, 30: 0.15, 40: 0.2, 50: 0.25, 60: 0.4, 70: 0.5, 80: 0.6, 90: 0.7, 100: 1 }[e] ?? 0.05;
@@ -224,14 +229,15 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
       '[style*="background-color: rgb(24, 24, 27)"]',
     ].join(',\n') + ` { background-color: var(--rn-clr-background-secondary) !important; }`,
   );
-  // Hinweis-Karten mit fest eingebautem Weiss-Verlauf
-  parts.push(
-    `[style*="linear-gradient(rgb(255, 255, 255)"] { background: var(--rn-clr-background-secondary) !important; }`,
-  );
+  // Weitere fest eingebaute Flächen, Rahmen und Verläufe (Lernkarten-Startseite, Pläne, AI-Guthaben …)
+  parts.push(buildInlineCss());
   // Hinweis-Blasen mit fest eingebautem Farbverlauf
   parts.push(
     `.rn-tooltip-gradient, .rn-tooltip-purple { background: var(--rn-clr-background-secondary) !important; border-color: ${p.accent} !important; --rn-tooltip-background: var(--rn-clr-background-secondary) !important; --rn-tooltip-border: ${p.accent} !important; }`,
   );
+  // Dunkle Themes: RemNotes «dark:»-Gestaltung auch im hellen Modus verwenden
+  // (z. B. Hintergrund beim Lernkarten-Üben, Schliessen-Knopf, Hinweisfelder)
+  if (dark) parts.push(buildDarkVariantCss());
   // Rechteck beim Aufziehen einer Auswahl
   parts.push(`#selection-rectangle { background-color: rgba(${accent.join(', ')}, 0.2) !important; }`);
 

@@ -211,9 +211,22 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
   parts.push(`body { background-color: ${p.background}; color: ${p.foreground}; caret-color: ${p.accent}; }`);
   parts.push(`::selection { background: ${p.selection}; color: ${p.bright_foreground}; }`);
   parts.push(`a, .rn-link { color: ${p.accent}; }`);
-  // Tab-Leiste und Seitenleiste haben ihre Hintergrundfarbe fest im HTML (style="background-color: …")
+  // Tab-Leiste, Seitenleiste, AI Tutor u. a. haben ihre Hintergrundfarbe fest im HTML
+  // (style="background-color: …"): #FCFCFC hell / #181818 dunkel, auf dem Tablet #FCFCFF / #18181B.
   parts.push(
-    `#tab-bar-container, .document-sidebar__container { background-color: var(--rn-clr-background-secondary) !important; }`,
+    [
+      '#tab-bar-container',
+      '.document-sidebar__container',
+      '.rn-ai-chat-container',
+      '[style*="background-color: rgb(252, 252, 252)"]',
+      '[style*="background-color: rgb(24, 24, 24)"]',
+      '[style*="background-color: rgb(252, 252, 255)"]',
+      '[style*="background-color: rgb(24, 24, 27)"]',
+    ].join(',\n') + ` { background-color: var(--rn-clr-background-secondary) !important; }`,
+  );
+  // Hinweis-Karten mit fest eingebautem Weiss-Verlauf
+  parts.push(
+    `[style*="linear-gradient(rgb(255, 255, 255)"] { background: var(--rn-clr-background-secondary) !important; }`,
   );
   // Hinweis-Blasen mit fest eingebautem Farbverlauf
   parts.push(

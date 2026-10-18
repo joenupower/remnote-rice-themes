@@ -217,17 +217,42 @@ export function accentReport(p: Palette): { textOnAccent: number; onColor: numbe
   return { textOnAccent, onColor, risky: textOnAccent < 3 };
 }
 
-// Markierfarben von RemNote (Variablen --highlight-color-…)
-const HIGHLIGHT_COLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'brown', 'pink', 'gray'];
+/**
+ * RemNotes eigene Farbstufen für die Markier-Tupfer (Stylesheet 1.28).
+ * Ein Tupfer ist «bg-…-5 dark:bg-…-80», gewählt mit Ring «ring-…-70 dark:ring-…-80»
+ * und Punkt «bg-…-60 dark:bg-…-40». Pro Farbe: [Fläche, Ring, Punkt].
+ * Hell = Stufen 5/70/60 aus «:root», dunkel = Stufen 80/80/40 aus «.dark».
+ */
+const SWATCHES: Record<string, { light: [string, string, string]; dark: [string, string, string] }> = {
+  red: { light: ['255 229 233', '184 7 44', '230 25 63'], dark: ['250 186 192', '250 186 192', '216 70 91'] },
+  orange: { light: ['255 232 221', '168 46 0', '208 61 0'], dark: ['250 193 171', '250 193 171', '213 82 37'] },
+  yellow: { light: ['255 248 217', '239 172 0', '255 192 2'], dark: ['251 233 156', '251 233 156', '222 178 34'] },
+  green: { light: ['209 255 226', '0 110 11', '0 131 22'], dark: ['144 215 168', '144 215 168', '67 134 83'] },
+  blue: { light: ['232 236 255', '33 64 219', '54 88 255'], dark: ['181 193 255', '181 193 255', '75 105 254'] },
+  purple: { light: ['246 235 255', '123 32 249', '139 55 255'], dark: ['223 195 254', '223 195 254', '152 87 242'] },
+  brown: { light: ['254 237 230', '183 60 0', '212 78 10'], dark: ['250 211 182', '250 211 182', '195 136 107'] },
+  pink: { light: ['255 225 242', '189 0 160', '222 0 166'], dark: ['250 178 223', '250 178 223', '213 66 175'] },
+  gray: { light: ['244 244 250', '81 81 103', '99 99 123'], dark: ['190 190 198', '190 190 198', '108 108 119'] },
+};
 
-function highlightSwatchCss(): string[] {
-  const swatch = (c: string) =>
-    `html body :is(.selected-text-menu__button--color, [data-test="PDF Highlight Color Button"] > span).bg-${c}-5`;
-  return [
-    ...HIGHLIGHT_COLORS.map((c) => `${swatch(c)} { background-color: var(--highlight-color-${c}) !important; }`),
-    // Ohne gewählte Farbe zeigt der Knopf ein gelbes Karomuster
-    `html body [data-test="PDF Highlight Color Button"] > span { --rn-colors-yellow-5: var(--highlight-color-yellow); --rn-colors-yellow-80: var(--highlight-color-yellow); }`,
-  ];
+/**
+ * Markier-Tupfer (Textauswahl im Dokument, PDF-Werkzeugleiste): Farben wie in RemNote selbst,
+ * bei dunklen Themes wie in RemNotes Dunkelmodus. Pastell auf dunkler Leiste wirkt sonst blass.
+ */
+function highlightSwatchCss(dark: boolean): string[] {
+  const base = 'html body :is(.selected-text-menu__button--color, [data-test="PDF Highlight Color Button"] > span)';
+  const rules = Object.entries(SWATCHES).map(([c, v]) => {
+    const [bg, ring, dot] = dark ? v.dark : v.light;
+    return (
+      `${base}.bg-${c}-5 { background-color: rgb(${bg}) !important; ` +
+      `--rn-colors-${c}-70-val: ${ring}; --rn-colors-${c}-80-val: ${ring}; ` +
+      `--rn-colors-${c}-60-val: ${dot}; --rn-colors-${c}-40-val: ${dot}; }`
+    );
+  });
+  // Ohne gewählte Farbe zeigt der Knopf ein gelbes Karomuster
+  const yellow = dark ? SWATCHES.yellow.dark[0] : SWATCHES.yellow.light[0];
+  rules.push(`${base} { --rn-colors-yellow-5: rgb(${yellow}); --rn-colors-yellow-80: rgb(${yellow}); }`);
+  return rules;
 }
 
 // Auch auf :root setzen: RemNote rechnet zusammengesetzte Variablen (z. B. --rn-colors-blue-5)
@@ -327,8 +352,8 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
   parts.push(
     `html body .rn-clr-background-accent :is(.rn-clr-content-primary, .dark\\:rn-clr-content-primary) { color: var(--rn-clr-content-on-color) !important; }`,
   );
-  // Farbtupfer zum Markieren (Textauswahl im Dokument und im PDF) zeigen die echten Markierfarben
-  parts.push(...highlightSwatchCss());
+  // Farbtupfer zum Markieren (Textauswahl im Dokument, PDF-Werkzeugleiste) in RemNotes eigenen Farben
+  parts.push(...highlightSwatchCss(dark));
   // Rechteck beim Aufziehen einer Auswahl
   parts.push(`#selection-rectangle { background-color: rgba(${accent.join(', ')}, 0.2) !important; }`);
 

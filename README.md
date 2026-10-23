@@ -1,6 +1,6 @@
 # Rice Themes
 
-22 unixporn-style color themes for RemNote: Tokyo Night, Gruvbox, Nord, Kanagawa, Catppuccin, Rosé Pine, Everforest and many more. Pick a theme and the whole app follows: sidebar, editor, flashcards, menus and dialogs.
+22 unixporn-style color themes for RemNote. Pick a theme and the whole app follows: sidebar, editor, flashcards, menus and dialogs.
 
 ![All 22 themes, one per second](https://raw.githubusercontent.com/joenupower/remnote-rice-themes/main/docs/rice-themes.gif)
 
@@ -36,9 +36,3 @@ The plugin runs sandboxed and only uses official plugin APIs. No data leaves Rem
 - Theme designs: Tokyo Night, Nord, Everforest, Catppuccin, Gruvbox, Kanagawa, Rosé Pine, Flexoki and others belong to their respective authors.
 
 Source code and technical details: [github.com/joenupower/remnote-rice-themes](https://github.com/joenupower/remnote-rice-themes) (see `DEVELOPMENT.md`).
-
-## Deutsch
-
-**Rice Themes** bringt 22 Farbthemes im Unixporn-Stil nach RemNote, darunter Tokyo Night, Gruvbox, Nord, Kanagawa, Catppuccin und Rosé Pine (17 dunkle, 5 helle). Das Theme färbt die ganze App ein: Seitenleiste, Editor, Lernkarten, Menüs und Dialoge. Dazu gibt es eine Terminal-Schrift (Monospace) und eckige Kanten, beides lässt sich abschalten.
-
-Auswahl unter Einstellungen → Plugins → Rice Themes. Änderungen greifen nach wenigen Sekunden, ohne Neuladen. Farbwähler, Zeichnungen und PDF-Seiten behalten ihre Farben. Es werden keine Daten aus RemNote hinausgeschickt.

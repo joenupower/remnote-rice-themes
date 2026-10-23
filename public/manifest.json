@@ -6,12 +6,12 @@
   "repoUrl": "https://github.com/joenupower/remnote-rice-themes",
   "version": {
     "major": 1,
-    "minor": 1,
-    "patch": 3
+    "minor": 2,
+    "patch": 0
   },
   "theme": [],
   "enableOnMobile": true,
-  "description": "22 unixporn-style themes for RemNote: Tokyo Night, Gruvbox, Nord, Kanagawa, Catppuccin, Rosé Pine, Everforest and more, with optional monospace font and square corners.",
+  "description": "47 unixporn-style themes for RemNote: Tokyo Night, Gruvbox, Nord, Dracula, Catppuccin, Rosé Pine, Solarized and more, with optional monospace font and square corners.",
   "requestNative": false,
   "requiredScopes": [
     {

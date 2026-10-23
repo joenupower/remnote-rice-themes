@@ -9,7 +9,7 @@
  */
 import palettesJson from './palettes.json';
 import { buildInlineCss } from './inline';
-import { buildDarkVariantCss } from './dark-variants';
+import { buildDarkVariantCss, DARK_HIGHLIGHTS } from './dark-variants';
 
 export interface Palette {
   id: string;
@@ -206,6 +206,33 @@ export function onAccentColor(p: Palette): string {
 }
 
 /**
+ * Kleinster Kontrast einer Schriftfarbe auf den dunklen Markierfarben (über dem Hintergrund).
+ */
+export function minHighlightContrast(p: Palette, text: string): number {
+  const bg = hexToRgb(p.background);
+  const fg = hexToRgb(text);
+  let min = Infinity;
+  for (const value of Object.values(DARK_HIGHLIGHTS)) {
+    const m = value.match(/rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/);
+    const surface: RGB = m ? mix(bg, [+m[1], +m[2], +m[3]], +m[4]) : hexToRgb(value);
+    min = Math.min(min, contrast(fg, surface));
+  }
+  return min;
+}
+
+/**
+ * Schrift auf markiertem Text in dunklen Themes: Ist die normale Schrift auf einer Markierfarbe
+ * unter 3:1 (z. B. Solarized Dark auf Gelb) und hebt sich die hellste Schrift besser ab,
+ * nimmt markierter Text die hellste Schrift. Sonst bleibt alles wie es ist (null).
+ */
+export function highlightTextColor(p: Palette): string | null {
+  if (p.mode !== 'dark') return null;
+  const normal = minHighlightContrast(p, p.foreground);
+  if (normal >= 3) return null;
+  return minHighlightContrast(p, p.bright_foreground) > normal + 0.05 ? p.bright_foreground : null;
+}
+
+/**
  * Prüft, wo Schrift und Akzent zu ähnlich sind. Genau dann wäre normale Schrift auf einem
  * Akzentknopf schlecht lesbar (unter 3:1). Liefert Kontrast Schrift/Akzent und den Kontrast
  * der Schrift, die das Theme auf Akzentflächen tatsächlich verwendet.
@@ -346,6 +373,8 @@ export function buildThemeCss(p: Palette, opts: ThemeOptions): string {
   // Dunkle Themes: RemNotes «dark:»-Gestaltung auch im hellen Modus verwenden
   // (z. B. Hintergrund beim Lernkarten-Üben, Schliessen-Knopf, Hinweisfelder)
   if (dark) parts.push(buildDarkVariantCss());
+  const onHighlight = highlightTextColor(p);
+  if (onHighlight) parts.push(`html body .has-highlight-color { color: ${onHighlight} !important; }`);
   // Schrift auf Akzentflächen (Hauptknöpfe wie «Upload plugin», «Develop»): RemNote nimmt im
   // Dunkelmodus die normale Schriftfarbe («dark:rn-clr-content-primary»). Ist der Akzent so hell
   // wie die Schrift (z. B. Kanagawa), verschwindet sie. Darum gilt hier die Schrift für farbige Flächen.

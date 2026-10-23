@@ -1,15 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <rect width="256" height="256" rx="56" fill="#1a1b26"/>
-  <!-- Terminal-Fenster -->
-  <rect x="36" y="48" width="184" height="128" fill="#24283b" stroke="#7aa2f7" stroke-width="4"/>
-  <text x="54" y="104" font-family="monospace" font-size="34" font-weight="700" fill="#9ece6a">&gt;_</text>
-  <rect x="54" y="128" width="96" height="8" fill="#565f89"/>
-  <rect x="54" y="146" width="64" height="8" fill="#565f89"/>
-  <!-- Farbpalette -->
-  <rect x="36" y="192" width="30" height="20" fill="#f7768e"/>
-  <rect x="67" y="192" width="30" height="20" fill="#e0af68"/>
-  <rect x="98" y="192" width="30" height="20" fill="#9ece6a"/>
-  <rect x="129" y="192" width="30" height="20" fill="#7dcfff"/>
-  <rect x="160" y="192" width="30" height="20" fill="#7aa2f7"/>
-  <rect x="191" y="192" width="29" height="20" fill="#bb9af7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<rect x="4" y="4" width="504" height="504" rx="110" fill="#1a1b26" stroke="#3b4261" stroke-width="8"/>
+<circle cx="116" cy="112" r="22" fill="#f7768e"/><circle cx="184" cy="112" r="22" fill="#e0af68"/><circle cx="252" cy="112" r="22" fill="#9ece6a"/>
+<polyline points="106,196 170,240 106,284" fill="none" stroke="#7aa2f7" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="206" y="210" width="48" height="60" rx="6" fill="#c0caf5"/>
+<clipPath id="bar"><rect x="80" y="342" width="352" height="74" rx="26"/></clipPath><g clip-path="url(#bar)"><rect x="80.0" y="342" width="59.2" height="74" fill="#f7768e"/><rect x="138.7" y="342" width="59.2" height="74" fill="#ff9e64"/><rect x="197.3" y="342" width="59.2" height="74" fill="#e0af68"/><rect x="256.0" y="342" width="59.2" height="74" fill="#9ece6a"/><rect x="314.7" y="342" width="59.2" height="74" fill="#7dcfff"/><rect x="373.3" y="342" width="59.2" height="74" fill="#bb9af7"/></g>
 </svg>
